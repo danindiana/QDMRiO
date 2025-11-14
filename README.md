@@ -1,105 +1,288 @@
-## Project Name:
-QDMRiO (Quantum Dot MiniReceiver Opto-Electronic) hat for Raspberry Pi5
+# QDMRiO
+## Quantum Dot MiniReceiver Opto-Electronic Hat for Raspberry Pi 5
 
-## Overview:
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-The `QDMRiO` project represents an innovative leap forward in the integration of quantum communication technologies. This custom module, designed to seamlessly interface with a Raspberry Pi 5 platform, harnesses cutting-edge components for efficient generation, transmission and reception of Quantum Dot Modulated Radio (QDMR) signals.
+## Overview
 
-## Objectives:
-1. Minimize size: The QDMRiO achieves this through the use of quantum dots that are engineered precisely to interact optimally with light at specific frequencies.
-2. Enhanced communication capabilities: By generating weak signal detection via single photon detectors such as SPADs or SNSPDs and ensuring accurate data decoding, we increase system efficiency.
+The `QDMRiO` project represents an innovative leap forward in quantum communication technologies. This custom HAT module interfaces with Raspberry Pi 5 to enable Quantum Dot Modulated Radio (QDMR) signal generation, transmission, and reception.
 
-## Key Features:
-- **Quantum Dot Array**:
-  * Material and Structure: Semiconductor materials like cadmium selenide (CdSe) or indium phosphide (InP).
-  * Size and Density: Carefully controlled for desired modulation frequencies & bandwidths. 
-  * Tuning Mechanisms allow fine-tuning of QDMR signal parameters.
-
-- **Optical Excitation Source**:
-  * Miniature Laser Diode/ LED which emits light at specific wavelength matching quantum dots’ absorption spectrum.
-  
-- **Sensitive Detector (SPAD/SNSPD)**: 
-    * Capable of detecting single photons with excellent timing resolution and low noise.
-
-- **Signal Processing Circuitry**:
-   * Analog & Digital signal processing for filtering, amplification, demodulation operations. 
-
-## Compatibility:
-QDMRiO module is compatible with the latest Raspberry Pi 5 platform which provides necessary infrastructure to control all components efficiently
-
-## Prerequisites:
-
-1. **Hardware:**
-    - Raspberry Pi 5
-    - Custom Quantum Dot Array
-    - Optical Excitation Source (Miniature Laser Diode or LED)
-    - Sensitive Detector (SPAD/SNSPD)
-
-2. **Software:**
-    - Python Development Environment with necessary libraries for signal processing
-
-## Getting Started:
-
-1. **Installation**:
-   Follow the instructions to set up Raspberry Pi 5 platform and connect all hardware components.
-
-2. **Configuration**.
-    Configure settings as per documentation provided along with setup files included in this repository.
-
-
-3. **Run QDMRiO**
-     Launch the control script for initiating quantum dot based communication process using Raspberry Pi.
-
-## Contributing:
-
-We invite you to contribute ideas or bug reports if encountered while utilizing our product, which will be useful to further improve it.
-  
-### Authors:
-- [Name 1](mailto:youremail@example.com)
-- [Name 2](mailto:youremail@example.com)
-
-#### License
-QDMRiO is licensed under the Apache license (version 2.0). The full license text can be found in [LICENSE](https://github.com/yourusername/QDMRiO/blob/master/LICENSE).
-
-**Note** - Before using our QDMRiO, users must comply with all applicable legal requirements pertaining to quantum communication and signal processing.
+### Quick Links
+- [Repository Structure](#repository-structure)
+- [System Architecture](#system-architecture)
+- [QRNG Integration](./anuqrng/readme.md)
+- [Getting Started](#getting-started)
+- [Technical Details](#technical-details)
 
 ---
 
-Happy Communication! 🚀
+## Repository Structure
 
-Your team,
+```mermaid
+graph TB
+    subgraph "QDMRiO Repository"
+        ROOT[📁 QDMRiO Root]
+        README[📄 README.md<br/>Project Overview & Diagrams]
+        LICENSE[📄 LICENSE<br/>Apache 2.0]
 
-The QDMRiO Development Team
+        subgraph "QRNG Module"
+            ANUDIR[📁 anuqrng/]
+            ANUREADME[📄 readme.md<br/>QRNG Documentation]
 
+            subgraph "Implementation"
+                SCRIPTDIR[📁 qrng-script/]
+                QRNGJS[📄 qrng.js<br/>Node.js Implementation]
+                SCRIPTREADME[📄 readme.md<br/>Setup Instructions]
+                EXAMPLE[📄 nodejs_example.md<br/>Usage Examples]
+            end
+        end
+    end
 
+    ROOT --> README
+    ROOT --> LICENSE
+    ROOT --> ANUDIR
+    ANUDIR --> ANUREADME
+    ANUDIR --> SCRIPTDIR
+    SCRIPTDIR --> QRNGJS
+    SCRIPTDIR --> SCRIPTREADME
+    SCRIPTDIR --> EXAMPLE
 
+    style ROOT fill:#e1f5ff
+    style ANUDIR fill:#fff3e0
+    style SCRIPTDIR fill:#f3e5f5
+    style QRNGJS fill:#c8e6c9
+```
 
+---
 
-Custom QDMR Hat Module: A Deep Dive into the Technology
+## System Architecture
 
-The custom QDMR hat module, a key component in the speculative hardware branch, represents a significant advancement in miniaturizing and integrating quantum communication technology.  This module, designed to seamlessly interface with the Raspberry Pi 5, is packed with cutting-edge components that enable efficient generation, transmission, and reception of QDMR signals.
+```mermaid
+graph LR
+    subgraph "QDMRiO Hardware Stack"
+        RPI5[Raspberry Pi 5<br/>🖥️ Main Controller]
+        HAT[QDMRiO HAT Module<br/>🔧 Custom Hardware]
 
-Quantum Dot Array:
+        subgraph "HAT Components"
+            QDA[Quantum Dot Array<br/>💎 CdSe/InP]
+            LASER[Optical Source<br/>🔦 Laser/LED]
+            DET[Detector<br/>📡 SPAD/SNSPD]
+            SIG[Signal Processor<br/>⚡ Analog/Digital]
+        end
 
-Material and Structure: The array consists of precisely engineered quantum dots, typically made of semiconductor materials like cadmium selenide (CdSe) or indium phosphide (InP). These dots are arranged in a specific pattern to optimize their interaction with light and radio waves.
-Size and Density: The size and density of the quantum dots are carefully controlled to achieve the desired modulation frequencies and bandwidths. Smaller dots typically emit light at higher frequencies, while larger dots emit light at lower frequencies.
-Tuning and Control: The quantum dot array may be equipped with mechanisms for fine-tuning the emission wavelength, such as voltage control or temperature regulation. This allows for dynamic adjustment of the QDMR signal parameters based on environmental conditions or communication requirements.
-Optical Excitation Source:
+        subgraph "Software Layer"
+            QRNG[QRNG Module<br/>🎲 Random Numbers]
+            CTRL[Control Scripts<br/>🐍 Python]
+            API[API Interface<br/>🌐 External]
+        end
+    end
 
-Miniature Laser or LED: The module incorporates a miniature laser diode or light-emitting diode (LED) as the optical excitation source. This source emits light at a specific wavelength that matches the absorption spectrum of the quantum dots in the array.
-Beam Shaping and Focusing: Optics are used to shape and focus the laser/LED beam onto the quantum dot array, ensuring efficient excitation of the dots and minimizing energy loss.
-Modulation Control: The intensity of the excitation source is modulated according to the information encoded in the heartbeat signal, effectively imprinting the data onto the emitted light.
-Sensitive Detector:
+    RPI5 <--> HAT
+    HAT --> QDA
+    HAT --> LASER
+    HAT --> DET
+    HAT --> SIG
 
-Single-Photon Avalanche Diode (SPAD): SPADs are highly sensitive detectors capable of detecting single photons of light. They offer excellent timing resolution and low noise, making them ideal for detecting the weak QDMR signals.
-Superconducting Nanowire Single-Photon Detector (SNSPD): SNSPDs are even more sensitive than SPADs, offering near-unity detection efficiency and extremely low dark counts. They are particularly well-suited for long-distance QDMR communication due to their high sensitivity.
-Signal Amplification: The module includes amplification circuitry to boost the weak signal detected by the SPAD or SNSPD, ensuring reliable detection and decoding of the transmitted information.
-Signal Processing Circuitry:
+    QDA <--> LASER
+    DET <--> QDA
+    DET --> SIG
 
-Filtering and Amplification: The module incorporates analog and digital signal processing circuitry to filter out noise, amplify the signal, and perform any necessary demodulation or decoding operations.
-Timing and Synchronization: Precise timing and synchronization circuits are essential for accurate decoding of the QDMR signal and maintaining communication integrity.
-Error Correction: The module may include error correction algorithms to compensate for any signal degradation or loss during transmission.
-Overall, the custom QDMR hat module represents a significant step forward in the development of practical quantum communication devices. By leveraging the power of quantum dots and the versatility of the Raspberry Pi 5, this module opens up new possibilities for secure and reliable communication in a wide range of applications.
+    RPI5 --> QRNG
+    RPI5 --> CTRL
+    QRNG <--> API
+
+    style RPI5 fill:#4caf50
+    style HAT fill:#2196f3
+    style QDA fill:#ff9800
+    style QRNG fill:#9c27b0
+```
+
+---
+
+## Component Interaction Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant RPI5 as Raspberry Pi 5
+    participant QRNG as QRNG Module
+    participant HAT as QDMRiO HAT
+    participant QD as Quantum Dots
+    participant Det as Detector
+
+    User->>RPI5: Initialize System
+    RPI5->>QRNG: Request Random Seed
+    QRNG->>QRNG: Fetch from ANU API
+    QRNG-->>RPI5: Return Quantum Random Numbers
+
+    RPI5->>HAT: Configure Parameters
+    HAT->>QD: Apply Modulation
+    QD->>QD: Generate QDMR Signal
+    QD->>Det: Emit Photons
+    Det->>HAT: Detect & Amplify
+    HAT->>RPI5: Return Processed Data
+    RPI5-->>User: Display Results
+```
+
+---
+
+## Key Features
+
+### Quantum Dot Array
+- **Materials**: CdSe (Cadmium Selenide) or InP (Indium Phosphide)
+- **Configuration**: Optimized for specific modulation frequencies
+- **Control**: Voltage/temperature tuning for dynamic adjustment
+
+### Optical Excitation Source
+- **Type**: Miniature Laser Diode or LED
+- **Wavelength**: Matched to quantum dot absorption spectrum
+- **Modulation**: Intensity-based data encoding
+
+### Sensitive Detector
+- **SPAD**: Single-Photon Avalanche Diode for timing-critical applications
+- **SNSPD**: Superconducting Nanowire for maximum sensitivity
+- **Performance**: Near-unity detection efficiency, low dark counts
+
+### Signal Processing
+- **Filtering**: Analog and digital noise reduction
+- **Synchronization**: Precise timing circuits
+- **Error Correction**: Signal degradation compensation
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+**Hardware:**
+- Raspberry Pi 5
+- QDMRiO Custom HAT (in development)
+- Power supply (5V/3A minimum)
+
+**Software:**
+- Raspberry Pi OS (64-bit recommended)
+- Python 3.9+
+- Node.js 16+ (for QRNG module)
+
+### Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/QDMRiO.git
+   cd QDMRiO
+   ```
+
+2. **Set up QRNG module** (for quantum random number generation)
+   ```bash
+   cd anuqrng/qrng-script
+   npm install
+   node qrng.js
+   ```
+   See [QRNG Documentation](./anuqrng/readme.md) for details.
+
+3. **Configure QDMRiO HAT**
+   ```bash
+   # Instructions coming soon
+   ```
+
+---
+
+## Git Workflow
+
+```mermaid
+gitGraph
+    commit id: "Initial project setup"
+    commit id: "Add QDMRiO docs"
+    branch feature/qrng
+    checkout feature/qrng
+    commit id: "Add QRNG integration"
+    commit id: "Add Node.js script"
+    commit id: "Add documentation"
+    checkout main
+    merge feature/qrng
+    commit id: "Update README"
+    branch feature/hardware
+    checkout feature/hardware
+    commit id: "HAT design v1"
+    commit id: "Component specs"
+    checkout main
+    merge feature/hardware
+    commit id: "Release v0.1"
+```
+
+---
+
+## Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Branches
+- `main`: Stable releases
+- `develop`: Active development
+- `feature/*`: New features
+- `bugfix/*`: Bug fixes
+
+---
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+**Important**: Users must comply with all applicable legal requirements pertaining to quantum communication and signal processing technologies.
+
+---
+
+## Authors & Contact
+
+- Development Team: [Contact Us](mailto:youremail@example.com)
+
+---
+
+**QDMRiO Development Team**
+
+---
+
+## Technical Details
+
+### Custom QDMR Hat Module: Deep Dive
+
+The custom QDMR hat module represents a significant advancement in miniaturizing and integrating quantum communication technology. This module seamlessly interfaces with the Raspberry Pi 5, enabling efficient generation, transmission, and reception of QDMR signals.
+
+#### Quantum Dot Array
+
+- **Material and Structure**: Precisely engineered quantum dots made of CdSe or InP, arranged to optimize interaction with light and radio waves
+- **Size and Density**: Carefully controlled for desired modulation frequencies and bandwidths
+  - Smaller dots emit at higher frequencies
+  - Larger dots emit at lower frequencies
+- **Tuning and Control**: Voltage control or temperature regulation for dynamic adjustment of QDMR signal parameters
+
+#### Optical Excitation Source
+
+- **Miniature Laser or LED**: Emits light at wavelength matching quantum dot absorption spectrum
+- **Beam Shaping and Focusing**: Optimizes excitation efficiency and minimizes energy loss
+- **Modulation Control**: Intensity modulation for data encoding
+
+#### Sensitive Detector
+
+- **SPAD (Single-Photon Avalanche Diode)**: Excellent timing resolution and low noise for weak signal detection
+- **SNSPD (Superconducting Nanowire Single-Photon Detector)**: Near-unity detection efficiency, ideal for long-distance communication
+- **Signal Amplification**: Boosts weak signals for reliable decoding
+
+#### Signal Processing Circuitry
+
+- **Filtering and Amplification**: Analog and digital processing for noise reduction and signal enhancement
+- **Timing and Synchronization**: Precise circuits for accurate QDMR signal decoding
+- **Error Correction**: Algorithms to compensate for signal degradation
+
+By leveraging quantum dots and Raspberry Pi 5, this module enables secure and reliable quantum communication for diverse applications.
 
 ```mermaid
 mindmap
@@ -143,48 +326,43 @@ mindmap
 ```
 
 
-Speculative Hardware Branch for QDMR Transmitter and Receiver Development:
+### Hardware Development Roadmap
 
-**Proposed Solution:** Leveraging Raspberry Pi 5 and Custom QDMR Hat Module
+#### Proposed Solution: Raspberry Pi 5 + Custom QDMR Hat
 
-This speculative branch proposes a cost-effective and accessible solution for QDMR transmitter and receiver development, utilizing the readily available Raspberry Pi 5 and a custom-designed QDMR hat module.
+This development approach leverages the Raspberry Pi 5 platform with a custom-designed QDMR HAT module for cost-effective, accessible quantum communication development.
 
-**Raspberry Pi 5:**
+#### Why Raspberry Pi 5?
 
-* **Powerful Processing:** The Raspberry Pi 5 offers a significant increase in processing power compared to its predecessors, making it suitable for handling the complex signal processing tasks involved in QDMR communication.
-* **Versatile Interface:** The Pi 5's GPIO pins and various communication protocols (e.g., I2C, SPI) provide a flexible interface for connecting and controlling the QDMR hat module.
-* **Open-Source Community:** The large and active Raspberry Pi community offers a wealth of resources, tutorials, and support, facilitating the development and troubleshooting of the QDMR hat module.
+- **Powerful Processing**: Handles complex signal processing for QDMR communication
+- **Versatile Interface**: GPIO pins, I2C, SPI protocols for HAT control
+- **Open-Source Community**: Extensive resources, tutorials, and support
 
-**Custom QDMR Hat Module:**
+#### Advantages
 
-* **Quantum Dot Array:** The module will house a precisely engineered array of quantum dots, optimized for modulating radio waves at specific frequencies.
-* **Optical Excitation Source:** A miniature laser or LED will be integrated into the module to excite the quantum dots and enable the modulation process.
-* **Sensitive Detector:** The module will include a highly sensitive detector, such as a single-photon avalanche diode (SPAD) or a superconducting nanowire single-photon detector (SNSPD), to accurately measure the modulated signal.
-* **Signal Processing Circuitry:** Dedicated circuitry will be incorporated to process and amplify the received signal, ensuring optimal performance and noise reduction.
+- **Cost-Effectiveness**: Significantly lower cost than specialized hardware
+- **Accessibility**: Readily available platform for researchers and hobbyists
+- **Flexibility**: Modular design allows experimentation with different quantum dot configurations
+- **Community Support**: Active collaboration and troubleshooting resources
 
-**Advantages of this Approach:**
+#### Technical Challenges
 
-* **Cost-Effectiveness:** Leveraging the Raspberry Pi 5 significantly reduces the cost compared to developing specialized hardware from scratch.
-* **Accessibility:** The Raspberry Pi 5 is readily available, making it accessible to researchers, hobbyists, and small-scale projects.
-* **Flexibility:** The modular design of the hat allows for easy customization and experimentation with different quantum dot materials and configurations.
-* **Community Support:** The Raspberry Pi community can provide valuable feedback, collaboration opportunities, and troubleshooting assistance.
+- **Quantum Dot Integration**: Fabrication, alignment, and thermal management on compact module
+- **Sensitivity and Noise**: Optimizing detector performance for reliable communication
+- **Power Consumption**: Managing power requirements for optical sources and detectors
 
-**Challenges and Considerations:**
+#### Potential Applications
 
-* **Quantum Dot Integration:** Integrating a high-performance quantum dot array onto a compact hat module poses technical challenges in terms of fabrication, alignment, and heat dissipation.
-* **Sensitivity and Noise:** Achieving the required sensitivity and noise levels for reliable QDMR communication in a small-scale device may require careful optimization of the detector and signal processing circuitry.
-* **Power Consumption:** The optical excitation source and sensitive detector may consume significant power, requiring careful power management to ensure the module's longevity.
+- **Secure Personal Communication**: Encrypted portable QDMR devices
+- **IoT Security**: Protected communication for IoT devices
+- **Medical Monitoring**: Secure real-time monitoring of implantable devices
+- **Scientific Research**: Platform for developing new quantum communication protocols
 
-**Potential Applications:**
+---
 
-This speculative hardware branch could lead to the development of affordable and accessible QDMR transmitters and receivers, enabling a wide range of applications, such as:
+## Appendix: Mermaid Diagram Reference
 
-* **Secure Personal Communication:**  Encrypted communication between individuals using portable QDMR devices.
-* **IoT Security:**  Secure communication for Internet of Things (IoT) devices, protecting sensitive data from unauthorized access.
-* **Medical Monitoring:** Real-time monitoring of implantable medical devices using secure QDMR communication.
-* **Scientific Research:** Development of new quantum communication protocols and applications using readily available hardware.
-
-By combining the power and versatility of the Raspberry Pi 5 with the unique properties of quantum dots, this speculative branch offers a promising path towards realizing the potential of QDMR for secure and reliable communication in the near future.
+### HAT Module Component Mindmap
 
 
 

@@ -1,0 +1,33 @@
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# QRNG generated files
+anuqrng/qrng-script/random_numbers.json
+anuqrng/qrng-script/error.log
+anuqrng/qrng-script/success.log
+anuqrng/qrng-script/nohup.out
+
+# npm files
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python cache (if future Python scripts are added)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+.env.local

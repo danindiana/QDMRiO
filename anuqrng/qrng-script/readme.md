@@ -1,152 +1,268 @@
-To set up the Node.js script on your Vagrant VM running Ubuntu 22.04, you'll need to follow these steps:
+# QRNG Script Setup Guide
 
-Install Node.js and npm: First, you need to install Node.js and npm (Node Package Manager) on your VM.
+Quick setup instructions for the ANU QRNG Node.js script.
 
-Create the Node.js Script: Create a new file for your Node.js script and save it with the necessary code.
+## Installation Flow
 
-Install Dependencies: Use npm to install the required dependencies (axios).
+```mermaid
+graph LR
+    A[Install Node.js & npm] --> B[Clone Repository]
+    B --> C[Navigate to qrng-script/]
+    C --> D[Run: npm init -y]
+    D --> E[Run: npm install axios]
+    E --> F[Run: node qrng.js]
+    F --> G[Script Running ✓]
 
-Run the Script: Execute the script using Node.js.
+    style A fill:#fff3e0
+    style E fill:#e1f5ff
+    style G fill:#c8e6c9
+```
 
-Here are the detailed steps:
+## Prerequisites
 
-Step 1: Install Node.js and npm
-Update the package list:
-
-bash
-Copy code
+**Ubuntu/Debian:**
+```bash
 sudo apt update
-Install Node.js and npm:
-
-bash
-Copy code
 sudo apt install -y nodejs npm
-Verify the installation:
+```
 
-bash
-Copy code
-node -v
-npm -v
-Step 2: Create the Node.js Script
-Create a directory for your project:
+**Verify Installation:**
+```bash
+node -v   # Should show v16.x or higher
+npm -v    # Should show 8.x or higher
+```
 
-bash
-Copy code
-mkdir qrng-script
-cd qrng-script
-Create the script file:
+## Setup Steps
 
-bash
-Copy code
-nano qrng.js
-Paste the Node.js script into the file:
+### 1. Navigate to Script Directory
+```bash
+cd anuqrng/qrng-script
+```
 
-javascript
-Copy code
-const axios = require('axios');
-const fs = require('fs');
-
-const API_URL = 'https://qrng.anu.edu.au/API/jsonI.php?length=1024&type=hex16';
-const ERROR_LOG_FILE = 'error.log';
-const RANDOM_NUMBERS_FILE = 'random_numbers.json';
-
-const makeRequest = async () => {
-  const retries = 3;
-  const delay = 2000; // 2 seconds
-
-  for (let i = 1; i <= retries; i++) {
-    console.log(`Sending request to QRNG API (Attempt ${i})...`);
-    try {
-      const response = await axios.get(API_URL);
-      if (response.status === 200) {
-        console.log(`Request successful (Status code: ${response.status})`);
-        const jsonResponse = response.data;
-
-        if (jsonResponse.success) {
-          fs.appendFileSync(RANDOM_NUMBERS_FILE, JSON.stringify(jsonResponse) + '\n');
-          console.log('Valid JSON response received.');
-          console.log('Received JSON data:', JSON.stringify(jsonResponse, null, 2));
-          console.log('Extracting hex numbers...');
-          const hexNumbers = jsonResponse.data.join('\n');
-          console.log(hexNumbers);
-          return true;
-        } else {
-          console.error('Request was not successful. Success field is false.');
-          fs.appendFileSync(ERROR_LOG_FILE, 'Request was not successful. Success field is false.\n');
-        }
-      } else {
-        console.error(`Request failed or rate limit exceeded (Status code: ${response.status}).`);
-        fs.appendFileSync(ERROR_LOG_FILE, `Request failed or rate limit exceeded, status code: ${response.status}\n`);
-      }
-    } catch (error) {
-      console.error(`Request failed or rate limit exceeded (Error: ${error.message}).`);
-      fs.appendFileSync(ERROR_LOG_FILE, `Request failed or rate limit exceeded, error: ${error.message}\n`);
-    }
-
-    if (i < retries) {
-      console.log(`Retrying in ${delay / 1000} seconds...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-
-  return false;
-};
-
-const shutdown = () => {
-  console.log('Shutting down... Saving any pending data and closing logs.');
-  process.exit(0);
-};
-
-process.on('SIGINT', shutdown);
-
-const mainLoop = async () => {
-  while (true) {
-    if (await makeRequest()) {
-      console.log('Sleeping for 60 seconds before next request...');
-      await new Promise(resolve => setTimeout(resolve, 60000));
-    } else {
-      console.log('Failed to get a valid response after 3 attempts. Sleeping for 60 seconds before next request...');
-      await new Promise(resolve => setTimeout(resolve, 60000));
-    }
-  }
-};
-
-mainLoop();
-Save and exit the file (Ctrl+X, then Y, then Enter).
-
-Step 3: Install Dependencies
-Initialize npm:
-
-bash
-Copy code
+### 2. Initialize npm Project
+```bash
 npm init -y
-Install axios:
+```
 
-bash
-Copy code
+This creates `package.json` with default settings.
+
+### 3. Install Dependencies
+```bash
 npm install axios
-Step 4: Run the Script
-Run the script:
+```
 
-bash
-Copy code
+Installs the HTTP client library required by `qrng.js`.
+
+### 4. Run the Script
+```bash
 node qrng.js
-Additional Tips
-Background Execution: If you want to run the script in the background, you can use nohup or screen.
+```
 
-Using nohup:
+Expected output:
+```
+Sending request to QRNG API (Attempt 1)...
+Request successful (Status code: 200)
+Valid JSON response received.
+Received JSON data:
+{
+  "success": true,
+  "length": 1024,
+  "type": "hex16",
+  "data": ["a3f2", "b4e1", ...]
+}
+Extracting hex numbers...
+a3f2
+b4e1
+...
+Sleeping for 60 seconds before next request...
+```
 
-bash
-Copy code
+### 5. Stop the Script
+Press `Ctrl+C` to trigger graceful shutdown:
+```
+^CShutting down... Saving any pending data and closing logs.
+```
+
+## Generated Files
+
+After running, you'll see:
+- **`random_numbers.json`**: Contains successful API responses (one JSON object per line)
+- **`error.log`**: Contains error messages from failed requests
+- **`package.json`**: npm configuration file
+- **`package-lock.json`**: Dependency lock file
+- **`node_modules/`**: Installed dependencies (should be in .gitignore)
+
+## Running in Background
+
+### Using nohup
+```bash
 nohup node qrng.js &
-Using screen:
+```
 
-bash
-Copy code
+Output goes to `nohup.out`. Stop with:
+```bash
+pkill -f "node qrng.js"
+```
+
+### Using screen
+```bash
 screen -S qrng
 node qrng.js
-Then press Ctrl+A followed by D to detach the screen session. You can reattach it later with screen -r qrng.
+```
 
-Logging: Ensure that the script has write permissions to the directory where it is running to create and append to log files.
+Detach: `Ctrl+A`, then `D`
+Reattach: `screen -r qrng`
 
-By following these steps, you should be able to set up and run the Node.js script on your Vagrant VM.
+### Using systemd (Recommended for Production)
+
+Create `/etc/systemd/system/qrng.service`:
+```ini
+[Unit]
+Description=ANU QRNG Fetcher
+After=network.target
+
+[Service]
+Type=simple
+User=your-username
+WorkingDirectory=/path/to/QDMRiO/anuqrng/qrng-script
+ExecStart=/usr/bin/node qrng.js
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable qrng.service
+sudo systemctl start qrng.service
+sudo systemctl status qrng.service
+```
+
+## Configuration Options
+
+Edit `qrng.js` to customize:
+
+```javascript
+// Line 4: API parameters
+const API_URL = 'https://qrng.anu.edu.au/API/jsonI.php?length=1024&type=hex16';
+//                                                              ^^^^    ^^^^^
+//                                                              |       |
+//                                                         Array length  Data type
+
+// Line 9: Retry settings
+const retries = 3;        // Number of retry attempts
+const delay = 2000;       // Delay between retries (ms)
+
+// Line 60: Sleep duration
+await new Promise(resolve => setTimeout(resolve, 60000));
+//                                                 ^^^^^
+//                                            Sleep time (ms)
+```
+
+### Available Data Types
+- `uint8`: 0-255
+- `uint16`: 0-65535
+- `hex16`: 0000-FFFF (hexadecimal)
+
+### Example: Fetch 100 uint8 values every 30 seconds
+```javascript
+const API_URL = 'https://qrng.anu.edu.au/API/jsonI.php?length=100&type=uint8';
+// ... (in mainLoop)
+await new Promise(resolve => setTimeout(resolve, 30000)); // 30 seconds
+```
+
+## Troubleshooting
+
+### "Module 'axios' not found"
+```bash
+npm install axios
+```
+
+### "Permission denied" on Linux
+```bash
+chmod +x qrng.js  # Not necessary for Node.js scripts, but doesn't hurt
+```
+
+### "ECONNREFUSED" or network errors
+- Check internet connectivity
+- Verify API is accessible: `curl https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16`
+- Check firewall settings
+
+### Script stops unexpectedly
+- Check `error.log` for details
+- Verify Node.js version compatibility
+- Use systemd service for automatic restart
+
+### High CPU usage
+- Increase sleep duration in `mainLoop()`
+- Reduce request frequency
+
+## Monitoring
+
+### View logs in real-time
+```bash
+# Random numbers
+tail -f random_numbers.json
+
+# Errors
+tail -f error.log
+```
+
+### Check file sizes
+```bash
+ls -lh random_numbers.json error.log
+```
+
+### Parse random numbers
+```bash
+# Extract just the hex values
+cat random_numbers.json | jq -r '.data[]' | head -20
+```
+
+## VM-Specific Notes
+
+**For Vagrant/Ubuntu VM:**
+```bash
+# Ensure VM has internet access
+ping -c 3 qrng.anu.edu.au
+
+# Check available memory
+free -h
+
+# Monitor resource usage
+top  # Press 'q' to quit
+```
+
+**Port Forwarding (if needed):**
+If running in VM and accessing from host, typically not needed for this script as it only makes outbound requests.
+
+## Security Considerations
+
+- **API Rate Limits**: Respect ANU's usage policies
+- **Data Storage**: `random_numbers.json` grows indefinitely; implement rotation
+- **Log Rotation**: Monitor `error.log` size
+
+### Implement Log Rotation
+```bash
+# Create logrotate config: /etc/logrotate.d/qrng
+/path/to/QDMRiO/anuqrng/qrng-script/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+}
+```
+
+## Next Steps
+
+- ✅ Script running successfully? Check [parent README](../readme.md) for integration details
+- 📚 Want to understand the code? See [nodejs_example.md](./nodejs_example.md)
+- 🔧 Need to modify behavior? Edit `qrng.js` and restart
+
+---
+
+**Back to:** [QRNG Module Documentation](../readme.md) | [QDMRiO Project](../../README.md)
